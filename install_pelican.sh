@@ -355,6 +355,41 @@ EOL
     fi
 }
 
+# Function to configure Apache server
+function configure_apache_server(){
+	DOMAIN=$(whiptail --inputbox "Enter your domain or IP address (Note: IPs cannot be used with SSL):" 10 60 3>&1 1>&2 2>&3)
+
+    # Disable the default configuring
+    a2dissite 000-default.conf
+	# Write the pelican.conf file
+    cat <<- EOF > "/etc/apache2/sites-available/pelican.conf"
+        <VirtualHost *:80>
+            ServerName ${DOMAIN}
+            DocumentRoot "/var/www/pelican/public"
+            
+            AllowEncodedSlashes On
+
+            php_value upload_max_filesize 100M
+            php_value post_max_size 100M
+
+            <Directory "/var/www/pelican/public">
+                AllowOverride all
+                Require all granted
+            </Directory>
+        </VirtualHost>
+	EOF
+
+    # Create a symlink to the conf file
+    ln -s /etc/apache2/sites-available/pelican.conf /etc/apache2/sites-enabled/pelican.conf
+    # Enable the new Pelican Configuration
+    a2enmod rewrite
+
+	systemctl restart apache2
+	if [ $? -ne 0 ]; then
+	    print_error "Apache failed to start.  Review the logs and fix."
+	fi
+}
+ 
 # Main script execution
 add_php_repo
 install_dependencies
