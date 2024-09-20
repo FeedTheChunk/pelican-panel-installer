@@ -57,7 +57,7 @@ install_dependencies() {
     if [ "$WEBSERVER" == "NGINX" ]; then
         sudo apt-get install -y nginx
     elif [ "$WEBSERVER" == "Apache" ]; then
-        sudo apt-get install -y apache2
+        sudo apt-get install -y apache2 libapache2-mod-php8.2
     fi
     if [ $? -ne 0 ]; then
         print_error "Failed to install dependencies."
