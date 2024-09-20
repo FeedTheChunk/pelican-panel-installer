@@ -403,7 +403,11 @@ initialize_database
 create_admin_user
 configure_crontab
 set_permissions
-configure_nginx
+if [ "$WEBSERVER" == "NGINX" ]; then 
+	configure_nginx
+else
+	configure_apache_server
+fi
 configure_redis_queue_worker
 
 print_success "Pelican Panel installation and configuration completed successfully!"
